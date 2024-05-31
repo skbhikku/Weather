@@ -47,7 +47,7 @@ const Weather = () => {
   }, [weatherData]);
 
   const weatherFetch = async (city) => {
-    const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=8d605743a6b803bdc36cac55174ec693`;
+    const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid={apiKey}`;
     try {
       const data = await fetch(url);
       if (!data.ok) {
