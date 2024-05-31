@@ -1,0 +1,116 @@
+.container {
+  max-width: 95%;
+  margin: auto;
+}
+
+.card {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+  padding: 20px;
+}
+
+.card-body {
+  padding: 20px;
+}
+
+.weather-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.icon-circle {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  margin-bottom: 10px;
+}
+
+.icon-name {
+  font-size: 1.5rem;
+}
+
+.temperature {
+  font-size: 3rem;
+  font-weight: bold;
+  margin: 20px 0;
+}
+
+.additional-info {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 10px;
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 5px;
+}
+
+.info-item strong {
+  flex-basis: 40%; /* Adjust as needed */
+  text-align: left;
+}
+
+.info-item span {
+  flex-basis: 60%; /* Adjust as needed */
+  text-align: right;
+}
+
+.fade-in {
+  animation: fadeIn 1s ease-in-out;
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.pulse {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@media (max-width: 768px) {
+  .card-title {
+    font-size: 1.5rem;
+  }
+
+  .icon-name {
+    font-size: 1.2rem;
+  }
+
+  .temperature {
+    font-size: 2.5rem;
+  }
+
+  .additional-info {
+    display: flex;
+    flex-direction: column;
+  }
+}

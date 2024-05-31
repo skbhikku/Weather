@@ -1,0 +1,286 @@
+
+
+
+https://nominatim.openstreetmap.org/search?format=json&q=rayapudi
+
+by city weather data
+https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=8d605743a6b803bdc36cac55174ec693
+
+ try {
+      const data = await fetch(url);
+      if (!data.ok) {
+        throw new Error('City not found');
+      }
+      const weatherData = await data.json();
+      setWeatherData(weatherData);
+      setCity('');
+    } catch (error) {
+      console.error(error);
+      setWeatherData(null); // Reset weather data if city not found
+    }
+
+
+
+
+
+
+    import React, { useState } from 'react';
+
+const Weather = () => {
+  const [city, setCity] = useState('');
+  const [position, setPosition] = useState(null);
+  const [weatherData, setWeatherData] = useState(null);
+  const [error, setError] = useState(null);
+
+  const handleChange = (event) => {
+    setCity(event.target.value);
+  };
+
+  const weatherFetch = async (city) => {
+    try {
+      const url = `https://nominatim.openstreetmap.org/search?format=json&q=${city}`;
+      const response = await fetch(url);
+      const latData = await response.json();
+
+      if (latData.length > 0) {
+        const location = latData[0];
+        const latitude = location.lat;
+        const longitude = location.lon;
+
+        setPosition({ latitude, longitude });
+        await weatherFetchByLocation(latitude, longitude);
+      } else {
+        throw new Error('City not found');
+      }
+    } catch (error) {
+      console.error(error);
+      setError('Error fetching location data');
+      setWeatherData(null);
+    }
+  };
+
+  const weatherFetchByLocation = async (latitude, longitude) => {
+    try {
+      const apiKey = 'YOUR_OPENWEATHERMAP_API_KEY'; // Replace with your OpenWeatherMap API key
+      const url = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=8d605743a6b803bdc36cac55174ec693`;
+      const response = await fetch(url);
+
+      if (!response.ok) {
+        throw new Error('Weather data not found');
+      }
+
+      const weatherData = await response.json();
+      setWeatherData(weatherData);
+      setError(null); // Reset error
+    } catch (error) {
+      console.error(error);
+      setError('Error fetching weather data');
+      setWeatherData(null);
+    }
+  };
+
+  const handleSearch = () => {
+    if (city) {
+      weatherFetch(city);
+    }
+  };
+
+  return (
+    <div>
+      <h1>Weather App</h1>
+      <input
+        type="text"
+        value={city}
+        onChange={handleChange}
+        placeholder="Enter city name"
+      />
+      <button onClick={handleSearch}>Search</button>
+      {error && <p style={{ color: 'red' }}>{error}</p>}
+      {weatherData && (
+        <div>
+          <h2>Weather in {city}</h2>
+          <p>Temperature: {weatherData.main.temp}°K</p>
+          <p>Weather: {weatherData.weather[0].description}</p>
+          <p>Latitude: {position.latitude}</p>
+          <p>Longitude: {position.longitude}</p>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default Weather;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import React, { useState, useEffect } from 'react';
+import { WiDaySunny, WiCloudy, WiRain, WiSnow, WiThunderstorm } from 'react-icons/wi';
+import backimage from './weather.jpg';
+
+const Weather = () => {
+  const [weatherData, setWeatherData] = useState(null);
+  const [city, setCity] = useState('');
+  const [searchCity, setSearchCity] = useState('');
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (searchCity) {
+      weatherFetch(searchCity);
+    }
+    document.body.style.backgroundColor = "#000435";
+  }, [searchCity]);
+
+  const weatherFetch = async (city) => {
+    try {
+      const geocodeUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${city}`;
+      const geocodeResponse = await fetch(geocodeUrl);
+      const geocodeData = await geocodeResponse.json();
+      
+      if (geocodeData.length === 0) {
+        throw new Error('City not found');
+      }
+
+      const { lat, lon } = geocodeData[0];
+      weatherFetchByLocation(lat, lon);
+      setCity('');
+    } catch (error) {
+      console.error(error);
+      setError('City not found');
+      setWeatherData(null);
+    }
+  };
+
+  const weatherFetchByLocation = async (latitude, longitude) => {
+    try {
+      const apiKey = '8d605743a6b803bdc36cac55174ec693'; // Replace with your OpenWeatherMap API key
+      const url = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${apiKey}`;
+      const response = await fetch(url);
+
+      if (!response.ok) {
+        throw new Error('Location not found');
+      }
+
+      const weatherData = await response.json();
+      setWeatherData(weatherData);
+      setError(null);
+    } catch (error) {
+      console.error(error);
+      setError('Error fetching weather data');
+      setWeatherData(null);
+    }
+  };
+
+  const convert = (kelvin) => {
+    const celsius = kelvin - 273.15;
+    return Math.round(celsius);
+  };
+
+  const getWeatherIcon = (weatherCode) => {
+    switch (weatherCode) {
+      case '01d':
+        return { icon: <WiDaySunny size={50} />, color: '#FFD700', name: 'Sunny' };
+      case '01n':
+        return { icon: <WiDaySunny size={50} />, color: '#4169E1', name: 'Clear Night' };
+      case '02d':
+        return { icon: <WiCloudy size={50} />, color: '#87CEEB', name: 'Partly Cloudy' };
+      case '02n':
+        return { icon: <WiCloudy size={50} />, color: '#708090', name: 'Partly Cloudy Night' };
+      case '03d':
+      case '03n':
+      case '04d':
+      case '04n':
+        return { icon: <WiCloudy size={50} />, color: '#808080', name: 'Cloudy' };
+      case '09d':
+      case '09n':
+        return { icon: <WiRain size={50} />, color: '#4682B4', name: 'Rain' };
+      case '10d':
+      case '10n':
+        return { icon: <WiRain size={50} />, color: '#6495ED', name: 'Rain Showers' };
+      case '11d':
+      case '11n':
+        return { icon: <WiThunderstorm size={50} />, color: '#0000CD', name: 'Thunderstorm' };
+      case '13d':
+      case '13n':
+        return { icon: <WiSnow size={50} />, color: '#87CEEB', name: 'Snow' };
+      default:
+        return null;
+    }
+  };
+
+  const handleSearch = (event) => {
+    event.preventDefault();
+    setSearchCity(city);
+  };
+
+  return (
+    <div className='container mt-5'>
+      <form className="d-flex mb-4" role="search" onSubmit={handleSearch}>
+        <input
+          className="form-control me-2"
+          type="search"
+          value={city}
+          placeholder="Search for a city"
+          aria-label="Search"
+          onChange={(e) => setCity(e.target.value)}
+        />
+        <button className="btn btn-outline-success" type="submit">Search</button>
+      </form>
+      {error && <p style={{ color: 'red' }}>{error}</p>}
+      {weatherData ? (
+        <div className="card text-center" style={{ backgroundColor: 'rgba(255, 255, 255, 0.4)', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)', borderRadius: '10px', padding: '20px' }}>
+          <div className="card-body">
+            <h5 className="card-title">{weatherData.name}</h5>
+            <h6 className="card-subtitle mb-2 text-muted">
+              {weatherData.weather[0].description}
+            </h6>
+            <div style={{ backgroundColor: 'rgba(225, 225, 225, 0.4)', padding: 20, borderRadius: 10, display: 'inline-block' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div style={{ backgroundColor: getWeatherIcon(weatherData.weather[0].icon).color, padding: 10, borderRadius: '50%' }}>
+                  {getWeatherIcon(weatherData.weather[0].icon).icon}
+                </div>
+                <span style={{ marginLeft: 10 }}>{getWeatherIcon(weatherData.weather[0].icon).name}</span>
+              </div>
+            </div>
+            <p className="card-text display-4">
+              {convert(weatherData.main.temp)}&deg;C
+            </p>
+            <ul className="list-group list-group-flush">
+              <li className="list-group-item">
+                Humidity: {weatherData.main.humidity}%
+              </li>
+              <li className="list-group-item">
+                Wind Speed: {weatherData.wind.speed} m/s
+              </li>
+              <li className="list-group-item">
+                Pressure: {weatherData.main.pressure} hPa
+              </li>
+              <li className="list-group-item">
+                Coordinates: {weatherData.coord.lat}, {weatherData.coord.lon}
+              </li>
+            </ul>
+          </div>
+        </div>
+      ) : (
+        <p>{error ? 'City not found. Please try again.' : 'Loading...'}</p>
+      )}
+    </div>
+  );
+};
+
+export default Weather;
